@@ -1,0 +1,1 @@
+{"version":3,"names":[],"mappings":"","sources":["main.js"],"sourcesContent":["\r\nconst test = () => {\r\n    console.log('test');\r\n    console.log('test');\r\n}\r\n\r\ntest();"],"file":"main.js"}
