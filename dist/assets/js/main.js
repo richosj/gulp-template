@@ -1,8 +1,17 @@
+import header from './gnb.js';
+//header('basic')
+// mobile check basic.
 
-const test = () => {
-    console.log('test');
-    console.log('test');
+function mobileCheck() {
+  var mobile = false;
+  if (window.innerWidth <= 768) {
+    mobile = true;
+  } else {
+    mobile = false;
+  }
+  return mobile;
 }
+const el = document.querySelector('.gnb');
 
-test();
+
 //# sourceMappingURL=main.js.map
