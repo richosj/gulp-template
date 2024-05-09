@@ -1,1 +1,1 @@
-{"version":3,"names":[],"mappings":"","sources":["main.js"],"sourcesContent":["import header from './gnb.js';\r\n//header('basic')\r\n// mobile check basic.\r\n\r\nfunction mobileCheck() {\r\n  var mobile = false;\r\n  if (window.innerWidth <= 768) {\r\n    mobile = true;\r\n  } else {\r\n    mobile = false;\r\n  }\r\n  return mobile;\r\n}\r\nconst el = document.querySelector('.gnb');\r\n\r\n"],"file":"main.js"}
+{"version":3,"names":[],"mappings":"","sources":["main.js"],"sourcesContent":["//import header from './gnb.js';\r\n\r\n\r\n\r\n\r\n"],"file":"main.js"}

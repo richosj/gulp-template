@@ -1,7 +1,6 @@
 import gulp from "gulp";
 import plumber from "gulp-plumber";
 import del from "del";
-//import ws from "gulp-webserver"; 에러 난다.
 import gulpSass from "gulp-sass";
 import dartSass from "dart-sass";
 import sourcemaps from "gulp-sourcemaps";
@@ -13,11 +12,17 @@ import bro from "gulp-bro";
 import minify from "gulp-minify";
 import fileInclude from "gulp-file-include";
 import cached from "gulp-cached";
-//import livereload from "gulp-livereload"; 에러 난다.
 import newer from "gulp-newer";
+import babelify from "babelify";
 require('@babel/register');
-const browserSync = require('browser-sync').create();
+
 //const reload = require('browser-sync').reload;
+//import ws from "gulp-webserver"; 에러 난다.
+//import livereload from "gulp-livereload"; 에러 난다.
+
+
+const browserSync = require('browser-sync').create();
+
 
 
 
@@ -72,20 +77,19 @@ const css = () => {
   const sass = gulpSass(dartSass);
   const options = {
     scss: {
-      outputStyle: "expanded",
+      outputStyle: "compressed",
       precision: 8,
       sourceComments: true,
       compiler: dartSass,
     },
-    //postcss: [require("tailwindcss"),autoprefixer({ overrideBrowserslist: 'last 2 versions' })] tailwind 사용시
-    postcss: [autoprefixer({ overrideBrowserslist: 'last 2 versions' })]
+    postcss: [require("tailwindcss"),autoprefixer({ overrideBrowserslist: 'last 2 versions' })] 
+    //postcss: [autoprefixer({ overrideBrowserslist: 'last 2 versions' })]
+    // ,//{since: gulp.lastRun(css)} last  run..
   };
 
-  return gulp.src(path_src.css + '/**/*.scss',
-    {since: gulp.lastRun(css)}
-    )
+  return gulp.src(path_src.css + '/**/*.scss')
     .pipe(plumber({ errorHandler: onErrorHandler }))
-    .pipe( cached('css') )
+    //.pipe( cached('css') )
     .pipe(browserSync.reload({ stream : true })) // sourcemap 위에 써야한다.
     .pipe(sourcemaps.init())
     .pipe(sass(options.scss).on('error', sass.logError))
@@ -101,10 +105,16 @@ const css = () => {
 
 // Task to compile JavaScript
 const js = () => {
-  return gulp.src(path_src.js + '/**/*.js')
+  return gulp.src(path_src.js + '/main.js')
     .pipe(plumber({ errorHandler: onErrorHandler }))
     .pipe(browserSync.reload({ stream : true }))
     .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe( bro({                                                // 트렌스파일 시작
+      transform: [
+        babelify.configure({ presets: ['@babel/preset-env'] }), // ES6 이상의 문법을 일반 브라우저가 코드를 이해할 수 있도록 변환
+        [ 'uglifyify', { global: true } ]                       // 코드 최소화 및 난독화
+      ]
+    }) )
     .pipe(sourcemaps.write('./'))
     .pipe(minify({ ext: { min: '.min.js' }, ignoreFiles: ['-min.js'] }))
     .pipe(gulp.dest(path_dist.js))
@@ -134,6 +144,7 @@ const watch = () => {
   gulp.watch(path_src.css + "/**/*.scss", css)
   gulp.watch(path_src.js + "/**/*", js)
   gulp.watch(path_src.fonts + "/**/*", fonts);
+  gulp.watch(path_src.images + "/**/*", image);
 }
 
 const live = gulp.parallel([ webserver, watch ]);
