@@ -14,17 +14,12 @@ import fileInclude from "gulp-file-include";
 import cached from "gulp-cached";
 import newer from "gulp-newer";
 import babelify from "babelify";
+import concat from "gulp-concat";
 require('@babel/register');
-
 //const reload = require('browser-sync').reload;
 //import ws from "gulp-webserver"; 에러 난다.
 //import livereload from "gulp-livereload"; 에러 난다.
-
-
 const browserSync = require('browser-sync').create();
-
-
-
 
 // Define source and destination paths
 const src = './src';
@@ -77,10 +72,12 @@ const css = () => {
   const sass = gulpSass(dartSass);
   const options = {
     scss: {
-      outputStyle: "compressed",
-      precision: 8,
-      sourceComments: true,
-      compiler: dartSass,
+      outputStyle: "expanded",                            // 컴파일 스타일: nested(default), expanded, compact, compressed
+      indentType: "tab",                                 // 들여쓰기 스타일: space(default), tab
+      indentWidth: 4,                                     // 들여쓰기 칸 수 (Default : 2)
+      precision: 8,                                       // 컴파일 된 CSS 의 소수점 자리수 (Type : Integer , Default : 5)
+      sourceComments: true,                               // 주석 제거 여부 (Default : false)
+      compiler: dartSass,                                 // 컴파일 도구
     },
     postcss: [require("tailwindcss"),autoprefixer({ overrideBrowserslist: 'last 2 versions' })] 
     //postcss: [autoprefixer({ overrideBrowserslist: 'last 2 versions' })]
@@ -89,7 +86,7 @@ const css = () => {
 
   return gulp.src(path_src.css + '/**/*.scss')
     .pipe(plumber({ errorHandler: onErrorHandler }))
-    //.pipe( cached('css') )
+    .pipe( cached('css') )
     .pipe(browserSync.reload({ stream : true })) // sourcemap 위에 써야한다.
     .pipe(sourcemaps.init())
     .pipe(sass(options.scss).on('error', sass.logError))
@@ -105,7 +102,10 @@ const css = () => {
 
 // Task to compile JavaScript
 const js = () => {
-  return gulp.src(path_src.js + '/main.js')
+  return gulp.src([
+      path_src.js + '/**/*.js',
+      '!' + path_src.js + '/vendor/**'
+    ])
     .pipe(plumber({ errorHandler: onErrorHandler }))
     .pipe(browserSync.reload({ stream : true }))
     .pipe(sourcemaps.init({ loadMaps: true }))
@@ -119,6 +119,12 @@ const js = () => {
     .pipe(minify({ ext: { min: '.min.js' }, ignoreFiles: ['-min.js'] }))
     .pipe(gulp.dest(path_dist.js))
 };
+
+// Task to vendor build
+const vendors = () => {
+  return gulp.src(path_src.js + '/vendor/**')
+  .pipe(gulp.dest(path_dist.js + '/vendor'))
+}
 
 // Task to move font files
 const fonts = () => {
@@ -149,8 +155,9 @@ const watch = () => {
 
 const live = gulp.parallel([ webserver, watch ]);
 
+export const cleans = gulp.series([clean]);
 // Task to build the project
-export const build = gulp.series([clean, gulp.parallel([html, css, js, fonts, image])]);
+export const build = gulp.series([clean, gulp.parallel([html, css, js, fonts, image, vendors])]);
 
 // Task to start the development environment
 export const dev = gulp.series([build, live]);

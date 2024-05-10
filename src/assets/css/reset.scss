@@ -1,3 +1,11 @@
+@import "./var/var";
+
+:root{
+    --html-size: 10px;
+    --font-size: 1rem;
+    --font-family: "Pretendard";
+}
+
 
 *{
     box-sizing: border-box;
@@ -38,8 +46,8 @@ button {
     cursor: pointer
 }
 body,th,td,input,select,textarea,button {
-    font-size: var(--root-font-size);
-    font-family: var(--root-font-family);
+    font-size: var(--font-size);
+    font-family: var(--font-family);
     line-height: 1;
     color: #333;
     
