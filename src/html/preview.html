@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    @@include('./include/meta.html')
+    <link rel="stylesheet" href="./assets/css/guide.css">
+</head>
+<body>
+
+<div class="preview">
+    <aside class="preview-aside">
+        <nav class="preview-device-type">
+            <button type="button" class="btn-type-select" data-type="Mobile">Mobile</button>
+            <button type="button" class="btn-type-select" data-type="Tablet">Tablet</button>
+            <button type="button" class="btn-type-select active" data-type="Desktop">Desktop</button>
+        </nav>
+        <div class="menu--list">
+            <div class="item view" role="button">
+                <span class="link"><a href="https://www.foodpolis.kr/fbip/co/main.do">메인</a></span>
+                <span class="link"><a href="https://www.foodpolis.kr/fbip/co/main.do">시안-1</a></span>
+                <span class="date">완료일 : 2024.05.01</span>
+                <span class="date">수정일 : 2024.05.02</span>
+            </div>
+            <div class="item view" role="button">
+                <span class="link"><a href="http://all4land.com/company/ceo.php">회사소개-회사소개-상세</a></span>
+                <span class="date">완료일 : 2024.05.01</span>
+                <span class="date">수정일 : 2024.05.02</span>
+            </div>
+        </div>
+    </aside>
+    <div class="preview-screen" data-view='Desktop'>
+        <iframe src="index.html" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script>
+    
+    let preview = function(){
+        this.previewScreen = document.querySelector('.preview-screen');
+        this.previewAside = document.querySelector('.preview-aside');
+        this.iframe = document.querySelector('.preview iframe');
+    };
+
+    const btnTypeSelect = document.querySelectorAll('.btn-type-select');
+    btnTypeSelect.forEach(btn => {
+        btn.addEventListener('click', event => {
+            let screen = new preview().previewScreen
+            
+            const dataType = btn.getAttribute('data-type');
+            const prevDataType = screen.getAttribute('data-view');
+
+            // 이전에 선택된 화면에서 데이터 유형 제거
+            screen.classList.remove(prevDataType);
+            screen.removeAttribute('data-view');
+
+            // 새로 선택된 버튼의 데이터 유형을 화면에 추가
+            screen.classList.add(dataType);
+            screen.setAttribute('data-view', dataType);
+
+            btn.parentElement.querySelectorAll('.btn-type-select').forEach(sib =>{
+                if(sib !== btn){
+                    sib.classList.remove('active');
+                }
+            })
+            btn.classList.add('active');
+        });
+    });
+
+    const pageView = document.querySelectorAll('.menu--list .item');
+
+    pageView.forEach(url => {
+        const link = url.querySelector('.link a');
+
+        url.addEventListener('click', event => {
+            let iframe = new preview().iframe;
+            iframe.setAttribute('src', link.getAttribute('href'));
+        })
+    })
+</script>
+
+</body></html>

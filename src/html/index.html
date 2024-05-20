@@ -6,55 +6,16 @@
 </head>
 
 <body>
-    <div id="wrap" class="wrap">
-        <div class="section section--1">
+<div id="wrap" class="wrap">
+
+    <aside class="mobile-gnb" id="mobileNav">
             
-        </div>
-        <div class="section section--2">
-            <div class="line line-2"></div>
-        </div>
-        <div class="section section--3">
+    </aside>
 
-        </div>
+    @@include('./include/form.email.html')
 
-        <script>
-
-            const section = document.querySelectorAll('.section');
-
-            let a,b,c;
-            
-            a = [0];
-
-            console.log(a)
-
-
-            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-            let observer = ScrollTrigger.normalizeScroll(true);
-
-            // --- testItem ---
-            gsap.from(".line-2", {
-            scrollTrigger: {
-                trigger: ".section--2",
-                scrub: true,
-                pin: true, // 고정 할것인지 정함.
-                start: "top top",
-                end: "+=50%",
-                onUpdate : (self) => {
-                    console.log(self.direction); // 진행 방향을 1과 -1을 콜백 
-                    console.log(self.progress); // 진행률
-                    console.log(self.isActive); // 이벤트 시작 true 끝 false
-                    //console.log(self.getVelocity());
-                },
-                markers: true
-            },
-            scaleX: 0, 
-            transformOrigin: "left center", 
-            ease: "none"
-            });
-            
-
-        </script>
-    </div>
+    <script src="./assets/js/main.js"></script>
+</div>
 </body>
 
 </html>

@@ -1,0 +1,12 @@
+
+%message-shared {
+    border: 1px solid #ccc;
+    padding: 10px;
+    color: #333;
+}
+
+@mixin responsive($breakpoint) {
+    @media (max-width: map.get($screen,$breakpoint)) {
+        @content;
+    }
+}

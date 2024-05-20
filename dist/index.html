@@ -9,63 +9,43 @@
 <link rel="stylesheet" href="./assets/js/vendor/jquery/jquery-ui.min.css">
 <script src="./assets/js/vendor/jquery/jquery-3.6.0.min.js"></script>
 <script src="./assets/js/vendor/jquery/jquery-ui.min.js"></script>
+<script src="./assets/js/vendor/bootstrap/bootstrap.min.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
 
+
 </head>
 
 <body>
-    <div id="wrap" class="wrap">
-        <div class="section section--1">
+<div id="wrap" class="wrap">
+
+    <aside class="mobile-gnb" id="mobileNav">
             
+    </aside>
+
+    <div class="container mx-auto">
+    <form onsubmit="validateForm(this); return false;">
+        <div class="form-email">
+            <input type="text" class="form-control" name="firstEmail" title="이메일 입력">
+            <span>@</span>
+            <input type="text" class="form-control" name="secondEmail" title="도메인 입력">
+            <select class="domain-list" onchange="dirDomain(this);">
+                <option value="직접입력">직접입력</option>
+                <option value="naver.com">naver.com</option>
+                <option value="google.com">google.com</option>
+                <option value="hanmail.net">hanmail.net</option>
+                <option value="nate.com">nate.com</option>
+                <option value="kakao.com">kakao.com</option>
+            </select>
         </div>
-        <div class="section section--2">
-            <div class="line line-2"></div>
-        </div>
-        <div class="section section--3">
+        <button type="submit" class="btn">Submit</button>
+    </form>
+</div>
 
-        </div>
-
-        <script>
-
-            const section = document.querySelectorAll('.section');
-
-            let a,b,c;
-            
-            a = [0];
-
-            console.log(a)
-
-
-            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-            let observer = ScrollTrigger.normalizeScroll(true);
-
-            // --- testItem ---
-            gsap.from(".line-2", {
-            scrollTrigger: {
-                trigger: ".section--2",
-                scrub: true,
-                pin: true, // 고정 할것인지 정함.
-                start: "top top",
-                end: "+=50%",
-                onUpdate : (self) => {
-                    console.log(self.direction); // 진행 방향을 1과 -1을 콜백 
-                    console.log(self.progress); // 진행률
-                    console.log(self.isActive); // 이벤트 시작 true 끝 false
-                    //console.log(self.getVelocity());
-                },
-                markers: true
-            },
-            scaleX: 0, 
-            transformOrigin: "left center", 
-            ease: "none"
-            });
-            
-
-        </script>
-    </div>
+    <script src="./assets/js/main.js"></script>
+</div>
 </body>
 
 </html>

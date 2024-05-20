@@ -8,6 +8,7 @@ import minificss from "gulp-minify-css";
 import autoprefixer from "autoprefixer";
 import postCss from "gulp-postcss";
 import rename from "gulp-rename";
+import dependents from "gulp-dependents";
 import bro from "gulp-bro";
 import minify from "gulp-minify";
 import fileInclude from "gulp-file-include";
@@ -43,7 +44,14 @@ const path_dist = {
 };
 
 // Error handler
-const onErrorHandler = (error) => console.log(error);
+//const onErrorHandler = (error) => console.log(error);
+
+// Error handler
+const onErrorHandler = (error) => {
+  console.log(error.toString());
+  this.emit('end');
+};
+
 
 // Task to clean dist folder
 const clean = () => del([dist], { allowEmpty: true });
@@ -67,38 +75,55 @@ const image = () => {
   .pipe( gulp.dest( path_dist.images ) );
 }
 
+
+const sassOptions = {
+  scss: {
+    outputStyle: "expanded",                            // 컴파일 스타일: nested(default), expanded, compact, compressed
+    indentType: "tab",                                 // 들여쓰기 스타일: space(default), tab
+    indentWidth: 4,                                     // 들여쓰기 칸 수 (Default : 2)
+    precision: 8,                                       // 컴파일 된 CSS 의 소수점 자리수 (Type : Integer , Default : 5)
+    sourceComments: true,                               // 주석 제거 여부 (Default : false)
+    compiler: dartSass,                                 // 컴파일 도구
+  },
+  postcss: [require("tailwindcss"),autoprefixer({ overrideBrowserslist: 'last 2 versions' })] 
+  //postcss: [autoprefixer({ overrideBrowserslist: 'last 2 versions' })]
+  // {since: gulp.lastRun(css)} last  run..
+};
+
 // Task to compile Sass to CSS
 const css = () => {
   const sass = gulpSass(dartSass);
-  const options = {
-    scss: {
-      outputStyle: "expanded",                            // 컴파일 스타일: nested(default), expanded, compact, compressed
-      indentType: "tab",                                 // 들여쓰기 스타일: space(default), tab
-      indentWidth: 4,                                     // 들여쓰기 칸 수 (Default : 2)
-      precision: 8,                                       // 컴파일 된 CSS 의 소수점 자리수 (Type : Integer , Default : 5)
-      sourceComments: true,                               // 주석 제거 여부 (Default : false)
-      compiler: dartSass,                                 // 컴파일 도구
-    },
-    postcss: [require("tailwindcss"),autoprefixer({ overrideBrowserslist: 'last 2 versions' })] 
-    //postcss: [autoprefixer({ overrideBrowserslist: 'last 2 versions' })]
-    // ,//{since: gulp.lastRun(css)} last  run..
-  };
-
+  //return gulp.src(path_src.css + '/**/*.scss',{ since: gulp.lastRun(css) })
   return gulp.src(path_src.css + '/**/*.scss')
-    .pipe(plumber({ errorHandler: onErrorHandler }))
-    .pipe( cached('css') )
-    .pipe(browserSync.reload({ stream : true })) // sourcemap 위에 써야한다.
-    .pipe(sourcemaps.init())
-    .pipe(sass(options.scss).on('error', sass.logError))
-    .pipe(postCss(options.postcss))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(path_dist.css))
-    .pipe(minificss())
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(sourcemaps.write()) 
-    .pipe(gulp.dest(path_dist.css))
-    
+  .pipe(plumber({ errorHandler: onErrorHandler }))
+  .pipe( dependents() )                                   // 현재 스트림에 있는 파일에 종속되는 모든 파일을 추가
+  .pipe( cached('css') )
+  .pipe(browserSync.reload({ stream : true })) // sourcemap 위에 써야한다.
+  .pipe(sourcemaps.init())
+  .pipe(sass(sassOptions.scss).on('error', sass.logError))
+  .pipe(postCss(sassOptions.postcss))
+  .pipe(sourcemaps.write())
+  //.pipe(concat('all.css'))
+  .pipe(gulp.dest(path_dist.css))
+  .pipe(minificss())
+  .pipe(rename({ suffix: '.min' }))
+  .pipe(sourcemaps.write()) 
+  .pipe(gulp.dest(path_dist.css))
+  
 };
+
+// tailwind 사용시 true;
+const tailwindUsed = true;
+const tail = () => {
+  const TailStream = gulp.src(path_src.css + '/**/style.scss')
+  .pipe(sass(sassOptions.scss).on('error', sass.logError))
+  .pipe(postCss(sassOptions.postcss))
+  .pipe(gulp.dest(path_dist.css))
+  if(tailwindUsed === true){
+    return TailStream;
+  }
+}
+
 
 // Task to compile JavaScript
 const js = () => {
@@ -148,6 +173,7 @@ let webserver = () => {
 const watch = () => {
   gulp.watch(path_src.html + "/**/*", html)
   gulp.watch(path_src.css + "/**/*.scss", css)
+  //gulp.watch(path_src.css + "/**/_*", tail)
   gulp.watch(path_src.js + "/**/*", js)
   gulp.watch(path_src.fonts + "/**/*", fonts);
   gulp.watch(path_src.images + "/**/*", image);
